@@ -1,0 +1,178 @@
+import { useState } from 'react';
+import { Search, Plus, Car, AlertCircle, Loader2 } from 'lucide-react';
+import { useCarros } from './hooks/useCarros';
+import { CarroCard } from './components/CarroCard';
+import { CarroForm } from './components/CarroForm';
+import { Button } from './components/ui/Button';
+import { Input } from './components/ui/Input';
+import { Carro, FormularioCarro } from './types/carro';
+
+function App() {
+
+  const { carros, carregando, erro, adicionar, atualizar, deletar } = useCarros();
+  
+  const [termoBusca, setTermoBusca] = useState('');
+
+  const [modalAberto, setModalAberto] = useState(false);
+  
+  const [carroEditando, setCarroEditando] = useState<Carro | null>(null);
+  
+  const carrosFiltrados = carros.filter((carro) => {
+    const termo = termoBusca.toLowerCase();
+    return (
+      carro.tituloVenda.toLowerCase().includes(termo) ||
+      carro.modelo.toLowerCase().includes(termo) ||
+      carro.ano.toString().includes(termo) ||
+      carro.preco.toString().includes(termo) ||
+      carro.descricao.toLowerCase().includes(termo) ||
+      carro.marca.toLowerCase().includes(termo)
+    );
+  });
+  
+
+  const handleAdicionar = () => {
+    setCarroEditando(null);
+    setModalAberto(true);
+  };
+  
+  const handleEditar = (carro: Carro) => {
+    setCarroEditando(carro);
+    setModalAberto(true);
+  };
+  
+  const handleSalvar = async (carroData: FormularioCarro) => {
+    if (carroEditando) {
+      await atualizar(carroEditando.id!, carroData);
+    } else {
+      await adicionar(carroData);
+    }
+  };
+  
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <header className="mb-8 animate-fade-in">
+          <div className="flex items-center justify-center mb-2">
+            <Car className="mr-3 text-primary-500" size={40} />
+            <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-600">
+              Estoque de Veículos
+            </h1>
+          </div>
+          
+          <p className="text-center text-dark-300 text-lg">
+            Gerencie e visualize os carros disponíveis para venda com estilo 🏎️
+          </p>
+        </header>
+
+        <div className="mb-8 flex flex-col sm:flex-row gap-4 animate-slide-up">
+          <div className="flex-1">
+            <Input
+              placeholder="Buscar por título, modelo, ano, preco, descricao, marca..."
+              value={termoBusca}
+              onChange={(e) => setTermoBusca(e.target.value)}
+              icone={<Search size={18} />}
+            />
+          </div>
+          
+          <Button
+            onClick={handleAdicionar}
+            size="lg"
+            className="sm:w-auto"
+          >
+            <Plus size={20} className="mr-2" />
+            Adicionar Carro
+          </Button>
+        </div>
+        
+        <main>
+          {carregando && (
+            <div className="flex flex-col items-center justify-center py-20 animate-fade-in">
+              <Loader2 className="animate-spin text-primary-500 mb-4" size={48} />
+              <p className="text-dark-300 text-lg">Carregando carros...</p>
+            </div>
+          )}
+
+          {erro && !carregando && (
+            <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-6 flex items-start gap-4 animate-scale-in">
+              <AlertCircle className="text-red-500 flex-shrink-0" size={24} />
+              <div>
+                <h3 className="text-red-400 font-bold mb-1">Erro ao carregar carros</h3>
+                <p className="text-red-300">{erro}</p>
+              </div>
+            </div>
+          )}
+
+          {!carregando && !erro && (
+            <>
+              <div className="mb-4 text-dark-300">
+                {termoBusca ? (
+                  <p>
+                    Encontradas <span className="text-primary-400 font-bold">{carrosFiltrados.length}</span> carro(s)
+                    
+                    {carrosFiltrados.length !== carros.length && (
+                      <span> de <span className="text-white font-bold">{carros.length}</span> total</span>
+                    )}
+                  </p>
+                ) : (
+                  <p>
+                    Total de <span className="text-primary-400 font-bold">{carros.length}</span> carro(s) na coleção
+                  </p>
+                )}
+              </div>
+
+              {carrosFiltrados.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {carrosFiltrados.map((carro) => (
+                    <CarroCard
+                      key={carro.id}
+                      carro={carro}
+                      aoEditar={handleEditar}
+                      aoDeletar={deletar}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-20 animate-fade-in">
+                  <Car className="mx-auto text-dark-600 mb-4" size={64} /> 
+                  <h3 className="text-xl font-bold text-dark-300 mb-2">
+                    {termoBusca ? 'Nenhuma carro encontrada' : 'Sua coleção está vazia'}
+                  </h3>
+                  <p className="text-dark-400 mb-6">
+                    {termoBusca 
+                      ? 'Tente buscar por outros termos' 
+                      : 'Comece adicionando sua primeira carro'}
+                  </p>
+                  {!termoBusca && (
+                    <Button onClick={handleAdicionar}>
+                      <Plus size={20} className="mr-2" />
+                      Adicionar Primeira Carro
+                    </Button>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+        </main>
+        
+        <CarroForm
+          aberto={modalAberto}
+          aoFechar={() => setModalAberto(false)}
+          aoSalvar={handleSalvar}
+          carroEditando={carroEditando}
+        />
+      </div>
+      
+      <footer className="mt-16 pb-8 text-center text-dark-400 text-sm">
+        <p>
+          Feito com ❤️ para ensinar React, TypeScript e APIs REST
+        </p>
+        <p className="mt-2">
+          Demonstra: GET, POST, PUT, DELETE | Docker | TailwindCSS
+        </p>
+      </footer>
+    </div>
+  );
+}
+
+export default App;

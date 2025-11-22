@@ -1,0 +1,6 @@
+# Dockerfile.dev
+# Apenas a imagem base. Nada de npm install aqui!
+FROM node:18-alpine
+
+# Define a pasta de trabalho
+WORKDIR /app

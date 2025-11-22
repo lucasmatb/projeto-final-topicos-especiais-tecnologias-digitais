@@ -1,0 +1,1 @@
+export const CAPA_PADRAO = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=300&h=300&fit=crop&q=80';

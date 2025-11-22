@@ -1,0 +1,44 @@
+{
+  "carros": [
+    {
+      "id": 1,
+      "tituloVenda": "Fusca 1972",
+      "modelo": "Fusca 1972",
+      "ano": 1972,
+      "preco": 10000,
+      "descricao": "Fusca 1972, restaurado, motor 1300. Clássico em ótimo estado.",
+      "capaUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRC5T9pBs068suWzmTRKScVRA7rMGQSwfqDlqd7Zr46xQ&s",
+      "marca": "VW"
+    },
+    {
+      "id": 2,
+      "tituloVenda": "Chevrolet Celta Preto 2010",
+      "modelo": "Celta 1.0 VHC-E",
+      "ano": 2010,
+      "preco": 18500,
+      "descricao": "Celta de segunda geração, motor VHC-E, econômico e ideal para o dia a dia.",
+      "capaUrl": "https://i.imgur.com/example-celta.jpg",
+      "marca": "Chevrolet"
+    },
+    {
+      "id": 3,
+      "tituloVenda": "Toyota Corolla XEi 2023",
+      "modelo": "Corolla XEi",
+      "ano": 2023,
+      "preco": 145000,
+      "descricao": "Sedan completo, automático, com garantia de fábrica e baixa quilometragem.",
+      "capaUrl": "https://i.imgur.com/example-corolla.jpg",
+      "marca": "Toyota"
+    },
+    {
+      "id": 4,
+      "tituloVenda": "Ford Maverick Lariat 2024",
+      "modelo": "Maverick Lariat FX4",
+      "ano": 2024,
+      "preco": 240000,
+      "descricao": "Picape compacta de luxo, tração integral, motor turbo. Estado de 0km.",
+      "capaUrl": "https://i.imgur.com/example-maverick.jpg",
+      "marca": "Ford"
+    }
+  ]
+}
