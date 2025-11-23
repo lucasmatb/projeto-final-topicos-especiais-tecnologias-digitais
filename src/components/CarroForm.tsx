@@ -3,7 +3,7 @@ import { Carro, FormularioCarro } from '../types/carro';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
-import { Car, CarFront, Banknote, Calendar, Image, Copyright, FileText } from 'lucide-react';
+import { Car, CarFront, Banknote, Calendar, Image, Copyright } from 'lucide-react';
 import { CAPA_PADRAO } from '../lib/constants';
 
 interface CarroFormProps {
@@ -62,13 +62,15 @@ export function CarroForm({ aberto, aoFechar, aoSalvar, carroEditando }: CarroFo
       novosErros.modelo = 'Modelo é obrigatório';
     }
 
-    if (!preco.toString().trim()) {
-      novosErros.preco = 'Preço é obrigatório';
+    if (isNaN(preco) || preco <= 0) {
+      novosErros.preco = 'Preço é obrigatório e deve ser um número válido';
     }
 
+    const anoAtual = new Date().getFullYear();
     const anoNumero = parseInt(ano);
-    if (!ano || isNaN(anoNumero) || anoNumero < 1900 || anoNumero > new Date().getFullYear() + 1) {
-      novosErros.ano = 'Ano inválido';
+
+    if (!ano || ano.length !== 4 || isNaN(anoNumero) || anoNumero < 1900 || anoNumero > anoAtual + 1) {
+      novosErros.ano = `Ano inválido (deve ser entre 1900 e ${anoAtual + 1})`;
     }
 
     if (!descricao.trim()) {
@@ -123,6 +125,30 @@ export function CarroForm({ aberto, aoFechar, aoSalvar, carroEditando }: CarroFo
     aoFechar();
   };
 
+  const formatarMoeda = (valor: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(valor);
+  };
+
+  const handlePrecoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valorTexto = e.target.value;
+    
+    const apenasNumeros = valorTexto.replace(/\D/g, '');
+    const valorNumerico = Number(apenasNumeros) / 100;
+
+    setPreco(valorNumerico);
+  };
+
+    const handleAnoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const valorLimpo = e.target.value.replace(/\D/g, '');
+
+      if (valorLimpo.length <= 4) {
+        setAno(valorLimpo);
+      }
+    };
+
   return (
     <Modal
       aberto={aberto}
@@ -131,7 +157,7 @@ export function CarroForm({ aberto, aoFechar, aoSalvar, carroEditando }: CarroFo
       tamanho="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
           <Input
             label="Título da venda do Carro"
             placeholder="Celta preto"
@@ -139,6 +165,17 @@ export function CarroForm({ aberto, aoFechar, aoSalvar, carroEditando }: CarroFo
             onChange={(e) => setTituloVenda(e.target.value)}
             erro={erros.tituloVenda}
             icone={<Car size={18} />}
+            required
+          />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input
+            label="Marca"
+            placeholder="Ex: Chevrolet"
+            value={marca}
+            onChange={(e) => setMarca(e.target.value)}
+            erro={erros.marca}
+            icone={<Copyright size={18} />}
             required
           />
 
@@ -156,46 +193,38 @@ export function CarroForm({ aberto, aoFechar, aoSalvar, carroEditando }: CarroFo
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Input
             label="Preço"
-            placeholder="Ex: 9999,99"
-            value={preco}
-            onChange={(e) => setPreco(e.target.valueAsNumber)}
+            type="tel" 
+            placeholder="R$ 0,00"
+            value={preco === 0 ? '' : formatarMoeda(preco)}
+            onChange={handlePrecoChange}
             erro={erros.preco}
             icone={<Banknote size={18} />}
             required
+            maxLength={18}
           />
 
           <Input
             label="Ano"
-            type="number"
-            placeholder="Ex: 1975"
+            type="text"
+            inputMode="numeric"
+            placeholder="Ex: 2024"
             value={ano}
-            onChange={(e) => setAno(e.target.value)}
+            onChange={handleAnoChange}
             erro={erros.ano}
             icone={<Calendar size={18} />}
-            min={1900}
-            max={new Date().getFullYear() + 1}
+            maxLength={4} 
             required
           />
         </div>
 
         <Input
           label="Descrição"
-          placeholder="Ex: Um belo carro."
+          placeholder="Ex: Carro em excelente estado, único dono..."
           value={descricao}
           onChange={(e) => setDescricao(e.target.value)}
           erro={erros.descricao}
-          icone={<FileText size={18} />}
           required
-        />
-
-        <Input
-          label="Marca"
-          placeholder="Ex: Chevrolet"
-          value={marca}
-          onChange={(e) => setMarca(e.target.value)}
-          erro={erros.marca}
-          icone={<Copyright size={18} />}
-          required
+          textarea
         />
 
         <Input

@@ -1,7 +1,6 @@
 /**
  * COMPONENTE: Modal (Janela Sobreposta)
- * 
- * Um modal acessível e responsivo para exibir conteúdo sobre a página.
+ * * Um modal acessível e responsivo para exibir conteúdo sobre a página.
  * Demonstra uso de portals, eventos de teclado e acessibilidade.
  */
 
@@ -80,14 +79,16 @@ export function Modal({ aberto, aoFechar, titulo, children, tamanho = 'md' }: Mo
         className={cn(
           'relative w-full bg-dark-800 rounded-xl shadow-2xl animate-scale-in',
           'border border-dark-700',
+          // CORREÇÃO: Limita altura e habilita flexbox vertical
+          'max-h-[90vh] flex flex-col',
           tamanhoClasses[tamanho]
         )}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-titulo"
       >
-        {/* Cabeçalho do modal */}
-        <div className="flex items-center justify-between p-6 border-b border-dark-700">
+        {/* Cabeçalho do modal - Fixo no topo */}
+        <div className="flex items-center justify-between p-6 border-b border-dark-700 shrink-0">
           <h2
             id="modal-titulo"
             className="text-xl font-bold text-white"
@@ -105,8 +106,8 @@ export function Modal({ aberto, aoFechar, titulo, children, tamanho = 'md' }: Mo
           </button>
         </div>
 
-        {/* Conteúdo do modal */}
-        <div className="p-6">
+        {/* Conteúdo do modal - Com scroll automático */}
+        <div className="p-6 overflow-y-auto">
           {children}
         </div>
       </div>
