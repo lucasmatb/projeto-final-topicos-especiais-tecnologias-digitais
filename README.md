@@ -193,7 +193,7 @@ npm run lint             # Verifica código
 
 ```
 
-### 3. Endpoints da API
+### Endpoints da API
 
 A aplicação consome uma API REST rodando em `http://localhost:3001`.
 
@@ -208,5 +208,3 @@ A aplicação consome uma API REST rodando em `http://localhost:3001`.
 
 - **DELETE** `http://localhost:3001/carros/:id`
   Remove um veículo do banco de dados (substitua `:id` pelo ID do carro).
-
-```
