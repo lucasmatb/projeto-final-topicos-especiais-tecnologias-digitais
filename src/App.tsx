@@ -102,7 +102,7 @@ function App() {
           <div className="flex items-center justify-center mb-2">
             <Car className="mr-3 text-primary-500" size={40} />
             <h1 className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-primary-600">
-              Estoque de Veículos
+              Revenda de Veículos
             </h1>
           </div>
           <p className="text-dark-300 text-lg">
