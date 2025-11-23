@@ -1,1 +1,1 @@
-export const CAPA_PADRAO = 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=300&h=300&fit=crop&q=80';
+export const CAPA_PADRAO = 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/VW_K%C3%A4fer%2C_Bj._1958_%282015-09-12_3727_b2%29.JPG/500px-VW_K%C3%A4fer%2C_Bj._1958_%282015-09-12_3727_b2%29.JPG';
