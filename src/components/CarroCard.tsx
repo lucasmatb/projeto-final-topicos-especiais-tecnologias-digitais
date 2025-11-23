@@ -8,13 +8,19 @@ interface CarroCardProps {
   carro: Carro;
   aoEditar: (carro: Carro) => void;
   aoDeletar: (id: number) => void;
+  somenteLeitura?: boolean;
 }
 
-export function CarroCard({ carro, aoEditar, aoDeletar }: CarroCardProps) {
+export function CarroCard({ carro, aoEditar, aoDeletar, somenteLeitura = false }: CarroCardProps) {
+  
   const handleDeletar = () => {
     if (window.confirm(`Tem certeza que deseja deletar "${carro.tituloVenda}"?`)) {
       aoDeletar(carro.id!);
     }
+  };
+
+  const formatarPreco = (valor: number) => {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   };
 
   return (
@@ -31,35 +37,36 @@ export function CarroCard({ carro, aoEditar, aoDeletar }: CarroCardProps) {
               }}
             />
             
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="absolute bottom-4 left-4 right-4 flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => aoEditar(carro)}
-                  className="flex-1"
-                  aria-label={`Editar ${carro.tituloVenda}`}
-                >
-                  <Edit2 size={16} className="mr-2" />
-                  Editar
-                </Button>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  onClick={handleDeletar}
-                  className="flex-1"
-                  aria-label={`Deletar ${carro.tituloVenda}`}
-                >
-                  <Trash2 size={16} className="mr-2" />
-                  Deletar
-                </Button>
+            {!somenteLeitura && (
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-4 left-4 right-4 flex gap-2">
+                  <Button 
+                    variant="secondary" 
+                    size="sm" 
+                    onClick={() => aoEditar(carro)} 
+                    className="flex-1"
+                    aria-label={`Editar ${carro.tituloVenda}`}
+                  >
+                    <Edit2 size={16} className="mr-2" /> Editar
+                  </Button>
+                  
+                  <Button 
+                    variant="danger" 
+                    size="sm" 
+                    onClick={handleDeletar} 
+                    className="flex-1"
+                    aria-label={`Deletar ${carro.tituloVenda}`}
+                  >
+                    <Trash2 size={16} className="mr-2" /> Deletar
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="p-4 flex-1 flex flex-col justify-between">
             <div className="mb-3">
-              <h3 className="text-lg font-bold text-white mb-1 line-clamp-1">
+              <h3 className="text-lg font-bold text-white mb-1 line-clamp-1" title={carro.tituloVenda}>
                 {carro.tituloVenda}
               </h3>
             </div>
@@ -72,12 +79,9 @@ export function CarroCard({ carro, aoEditar, aoDeletar }: CarroCardProps) {
 
               <div className="flex items-center text-dark-400">
                 <span className="font-medium text-dark-300 mr-2">Preço:</span>
-                <span className="line-clamp-1">{carro.preco}</span>
-              </div>
-
-              <div className="flex items-center text-dark-400">
-                <span className="font-medium text-dark-300 mr-2">Descrição:</span>
-                <span className="line-clamp-1">{carro.descricao}</span>
+                <span className="line-clamp-1 font-semibold text-primary-400">
+                  {formatarPreco(carro.preco)}
+                </span>
               </div>
 
               <div className="flex items-center text-dark-400">
@@ -85,7 +89,7 @@ export function CarroCard({ carro, aoEditar, aoDeletar }: CarroCardProps) {
                 <span className="line-clamp-1">{carro.marca}</span>
               </div>
               
-              <div className="flex items-center justify-between text-dark-400">
+              <div className="pt-2 mt-2 border-t border-dark-700 flex items-center justify-between text-dark-400">
                 <div>
                   <span className="font-medium text-dark-300 mr-2">Ano:</span>
                   <span>{carro.ano}</span>

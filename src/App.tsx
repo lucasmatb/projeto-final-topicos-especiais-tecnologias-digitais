@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Search, Plus, Car, AlertCircle, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Plus, Car, AlertCircle, Loader2, LogIn, LogOut, User } from 'lucide-react';
+import Cookies from 'js-cookie';
 import { useCarros } from './hooks/useCarros';
 import { CarroCard } from './components/CarroCard';
 import { CarroForm } from './components/CarroForm';
@@ -8,15 +9,31 @@ import { Input } from './components/ui/Input';
 import { Carro, FormularioCarro } from './types/carro';
 
 function App() {
-
   const { carros, carregando, erro, adicionar, atualizar, deletar } = useCarros();
   
   const [termoBusca, setTermoBusca] = useState('');
-
   const [modalAberto, setModalAberto] = useState(false);
-  
   const [carroEditando, setCarroEditando] = useState<Carro | null>(null);
   
+  const [logado, setLogado] = useState(false);
+
+  useEffect(() => {
+    const token = Cookies.get('auth_demo_token');
+    if (token) {
+      setLogado(true);
+    }
+  }, []);
+
+  const handleLogin = () => {
+    Cookies.set('auth_demo_token', 'token-fake-123', { expires: 1 });
+    setLogado(true);
+  };
+
+  const handleLogout = () => {
+    Cookies.remove('auth_demo_token');
+    setLogado(false);
+  };
+
   const carrosFiltrados = carros.filter((carro) => {
     const termo = termoBusca.toLowerCase();
     return (
@@ -28,7 +45,6 @@ function App() {
       carro.marca.toLowerCase().includes(termo)
     );
   });
-  
 
   const handleAdicionar = () => {
     setCarroEditando(null);
@@ -46,11 +62,37 @@ function App() {
     } else {
       await adicionar(carroData);
     }
+    setModalAberto(false); // Garante o fechamento após salvar
   };
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <div className="flex justify-end mb-4 animate-fade-in">
+          {logado ? (
+            <div className="flex items-center gap-3 bg-dark-800/50 p-2 rounded-lg border border-dark-700 backdrop-blur-sm">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-dark-700 rounded-md">
+                <User size={16} className="text-primary-500" />
+                <span className="text-sm font-medium text-white">Admin</span>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleLogout}
+                className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+              >
+                <LogOut size={16} className="mr-2" />
+                Sair
+              </Button>
+            </div>
+          ) : (
+            <Button variant="primary" size="sm" onClick={handleLogin}>
+              <LogIn size={16} className="mr-2" />
+              Login Admin
+            </Button>
+          )}
+        </div>
 
         <header className="mb-8 animate-fade-in">
           <div className="flex items-center justify-center mb-2">
@@ -68,21 +110,23 @@ function App() {
         <div className="mb-8 flex flex-col sm:flex-row gap-4 animate-slide-up">
           <div className="flex-1">
             <Input
-              placeholder="Buscar por título, modelo, ano, preco, descricao, marca..."
+              placeholder="Buscar por título, modelo, ano, preço..."
               value={termoBusca}
               onChange={(e) => setTermoBusca(e.target.value)}
               icone={<Search size={18} />}
             />
           </div>
           
-          <Button
-            onClick={handleAdicionar}
-            size="lg"
-            className="sm:w-auto"
-          >
-            <Plus size={20} className="mr-2" />
-            Adicionar Carro
-          </Button>
+          {logado && (
+            <Button
+              onClick={handleAdicionar}
+              size="lg"
+              className="sm:w-auto shadow-lg shadow-primary-500/20"
+            >
+              <Plus size={20} className="mr-2" />
+              Adicionar Carro
+            </Button>
+          )}
         </div>
         
         <main>
@@ -105,19 +149,20 @@ function App() {
 
           {!carregando && !erro && (
             <>
-              <div className="mb-4 text-dark-300">
+              <div className="mb-4 text-dark-300 flex justify-between items-end">
                 {termoBusca ? (
                   <p>
-                    Encontradas <span className="text-primary-400 font-bold">{carrosFiltrados.length}</span> carro(s)
-                    
-                    {carrosFiltrados.length !== carros.length && (
-                      <span> de <span className="text-white font-bold">{carros.length}</span> total</span>
-                    )}
+                    Encontrados <span className="text-primary-400 font-bold">{carrosFiltrados.length}</span> resultado(s)
                   </p>
                 ) : (
                   <p>
-                    Total de <span className="text-primary-400 font-bold">{carros.length}</span> carro(s) na coleção
+                    Total de <span className="text-primary-400 font-bold">{carros.length}</span> veículos
                   </p>
+                )}
+                {!logado && carros.length > 0 && (
+                  <span className="text-xs text-dark-500 italic hidden sm:inline-block">
+                    Faça login para acessar o resto do CRUD
+                  </span>
                 )}
               </div>
 
@@ -129,6 +174,7 @@ function App() {
                       carro={carro}
                       aoEditar={handleEditar}
                       aoDeletar={deletar}
+                      somenteLeitura={!logado}
                     />
                   ))}
                 </div>
@@ -136,17 +182,20 @@ function App() {
                 <div className="text-center py-20 animate-fade-in">
                   <Car className="mx-auto text-dark-600 mb-4" size={64} /> 
                   <h3 className="text-xl font-bold text-dark-300 mb-2">
-                    {termoBusca ? 'Nenhuma carro encontrada' : 'Sua coleção está vazia'}
+                    {termoBusca ? 'Nenhum carro encontrado' : 'Sua coleção está vazia'}
                   </h3>
                   <p className="text-dark-400 mb-6">
                     {termoBusca 
                       ? 'Tente buscar por outros termos' 
-                      : 'Comece adicionando sua primeira carro'}
+                      : logado 
+                        ? 'Comece adicionando seu primeiro carro'
+                        : 'Faça login para adicionar veículos'}
                   </p>
-                  {!termoBusca && (
+                  
+                  {!termoBusca && logado && (
                     <Button onClick={handleAdicionar}>
                       <Plus size={20} className="mr-2" />
-                      Adicionar Primeira Carro
+                      Adicionar Primeiro Carro
                     </Button>
                   )}
                 </div>
@@ -167,8 +216,8 @@ function App() {
         <p>
           Feito com ❤️ para ensinar React, TypeScript e APIs REST
         </p>
-        <p className="mt-2">
-          Demonstra: GET, POST, PUT, DELETE | Docker | TailwindCSS
+        <p className="mt-2 text-dark-500">
+          Demonstra: CRUD | Autenticação Fake | Docker | TailwindCSS
         </p>
       </footer>
     </div>
