@@ -33,7 +33,7 @@ npm run dev
 
 ### 4️⃣ Acessar
 
-- 🎵 Frontend: http://localhost:5173
+- 🎵 Frontend: http://localhost:3000
 - 🔌 API: http://localhost:3001
 - 📊 Dados: http://localhost:3001/carros
 
@@ -90,10 +90,10 @@ netstat -ano | findstr :3001
 taskkill /PID <PID> /F
 ```
 
-### Porta 5173 em uso
+### Porta 3001 em uso
 ```powershell
 # Encontrar o processo
-netstat -ano | findstr :5173
+netstat -ano | findstr :3001
 
 # Matar o processo
 taskkill /PID <PID> /F
